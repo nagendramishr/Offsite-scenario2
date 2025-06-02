@@ -1,0 +1,41 @@
+Database Model Updates
+
+- User model must include: username, email (unique), password hash, and role.
+- Enforce unique email addresses at the database and registration level.
+- Prepare for future upgrade to Azure OAuth2 authentication.
+
+Registration Endpoint & UI
+
+- Registration form: username, email, password, (role selection if admin).
+- Backend: create user, hash password, store in DB, enforce unique email.
+
+Login Endpoint & UI
+
+- Login form: username/email, password.
+- Backend: authenticate credentials, issue authentication cookie (Blazor Server) or JWT (if API-based).
+- Support login/logout from anywhere in the app (not just /Account).
+
+OAuth Integration
+
+- Integrate OAuth provider (Microsoft, Google) for authentication.
+- Update login flow to support OAuth.
+
+Role Assignment & Management
+
+- Admins can assign roles to users.
+- Enforce role-based access in backend and frontend UI.
+
+Access Control
+
+- Restrict actions and page visibility based on user role.
+- Example: Only admins can assign roles, only agents can be assigned tickets, etc.
+
+No Password Reset
+
+- Do not implement password reset endpoints or UI.
+
+Error Handling & Security
+
+- Handle duplicate email registration gracefully (show user-friendly error).
+- Show user-friendly error if multiple users with same email exist (defensive for legacy data).
+- Do not leak sensitive error details to users.

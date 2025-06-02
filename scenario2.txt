@@ -1,0 +1,43 @@
+scenario 2 is Contoso Support needs to add ticket data to their chat conversation.
+you need to create 3 additional agents, 1 to get ticket resolution information, 1 to get suggestions from those tickets, and 1 to create a summary from that information and finalize the conversation and coach on questions to ask.
+ 
+We are responsible for UI and Auth
+	1. toolkit for vectorizing documents
+	2. sample support issue documents
+	3. Cosmos store with issues and resolution
+	4. Product documentation
+ 
+stretch goal add in product documentation for additional suggestions
+stretch goal include history
+
+
+Functional Requirements
+Agent Integration
+
+Implement three additional agents:
+An agent to retrieve ticket resolution information.
+An agent to generate suggestions based on ticket data.
+An agent to summarize the information, finalize the conversation, and provide coaching on follow-up questions.
+UI and Authentication
+
+Develop a user interface for chat conversations.
+Implement authentication mechanisms for secure access.
+Document Vectorization
+
+Provide a toolkit for vectorizing support documents to enable efficient search and retrieval.
+Sample Data
+
+Supply sample support issue documents for testing and demonstration.
+Data Storage
+
+Use Azure Cosmos DB to store support issues and their resolutions.
+Product Documentation
+
+Integrate product documentation to enhance suggestion capabilities.
+Stretch Goals
+Enhanced Suggestions
+
+Incorporate product documentation as an additional source for generating suggestions.
+Conversation History
+
+Include conversation history in the chat interface for context and continuity.

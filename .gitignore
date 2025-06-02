@@ -1,0 +1,101 @@
+## .NET 9, .NET Core, and Visual Studio
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vs/
+.vscode/
+*.dbmdl
+*.pdb
+*.cache
+*.log
+*.tlog
+*.ide
+*.sdf
+*.opensdf
+*.VC.db
+*.vscode/
+*.DS_Store
+*.swp
+*.sln.ide
+*.ncrunch*
+_ReSharper*/
+*.resharper
+*.DotSettings.user
+TestResults/
+build/
+# Rider
+.idea/
+*.sln.iml
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Azure Pipelines
+.vsts/
+
+# Local NuGet packages
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Dotnet watch
+**/Properties/launchSettings.json
+
+# User secrets
+secrets.json
+
+# IIS Express
+.vs/
+*.vspscc
+*.vssscc
+*.userprefs
+
+# Coverage
+coverage/
+*.coverage
+*.coveragexml
+
+# Others
+*.tmp
+*.bak
+*.old
+*.orig
+*.rej
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# dotCover
+*.dotCover
+
+# NCrunch
+*.ncrunch*
+.*crunch*.local.xml
+
+# SonarQube
+.sonar/

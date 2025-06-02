@@ -1,0 +1,79 @@
+@page "/admin/roles"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using off2.Data
+@using off2.Data.Enums
+
+@attribute [Authorize(Roles = "Admin")]
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject RoleHelper RoleHelper
+
+<h3>User Role Management</h3>
+
+<div class="alert alert-info">
+    Only administrators can manage user roles.
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Current Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in users)
+                {
+                    <tr>
+                        <td>@user.UserName</td>
+                        <td>@user.Email</td>
+                        <td>@userRoles.GetValueOrDefault(user.Id)</td>
+                        <td>
+                            <select @onchange="async (e) => await UpdateUserRoleAsync(user, e.Value?.ToString())" class="form-select">
+                                @foreach (var role in Enum.GetValues<UserRole>())
+                                {
+                                    <option value="@role" selected="@(userRoles.GetValueOrDefault(user.Id) == role.ToString())">@role</option>
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private List<ApplicationUser> users = new();
+    private Dictionary<string, string> userRoles = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Ensure roles exist
+        await RoleHelper.EnsureRolesCreatedAsync();
+
+        // Get all users
+        users = UserManager.Users.ToList();
+
+        // Get roles for each user
+        foreach (var user in users)
+        {
+            var roles = await UserManager.GetRolesAsync(user);
+            userRoles[user.Id] = roles.FirstOrDefault() ?? UserRole.EndUser.ToString();
+        }
+    }    private async Task UpdateUserRoleAsync(ApplicationUser user, string? newRoleStr)
+    {
+        if (string.IsNullOrEmpty(newRoleStr)) return;
+
+        var newRole = Enum.Parse<UserRole>(newRoleStr);
+        await RoleHelper.UpdateUserRoleAsync(user, newRole);
+
+        // Update local state
+        userRoles[user.Id] = newRoleStr;
+    }
+}

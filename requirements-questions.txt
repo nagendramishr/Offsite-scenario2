@@ -1,0 +1,33 @@
+1. Project Setup & Tech Stack
+What programming language and framework do you want to use for the backend (e.g., Node.js, Python/Django, .NET)?
+What database system will you use (e.g., SQL Server, PostgreSQL, MongoDB)?
+Do you want a web frontend, mobile app, or both? Which frontend framework (e.g., React, Angular, Vue)?
+2. User Management & Authentication
+What authentication method do you prefer (e.g., email/password, OAuth, SSO)?
+What are the specific permissions for each role (End User, Support Agent, Admin)?
+Should users be able to reset their passwords or update their profiles?
+3. Ticket Management
+What fields should each ticket have (e.g., title, description, priority, status, category, attachments)?
+Should tickets have unique IDs? What format?
+What are the possible statuses for a ticket (e.g., Open, In Progress, Closed, Reopened)?
+How should tickets be assigned to agents (manual, automatic, round-robin)?
+4. Communication & Collaboration
+Should users and agents receive email or in-app notifications for ticket updates?
+What types of files can be attached to tickets? Any size limits?
+Should comments support rich text or just plain text?
+5. Dashboard & Reporting
+What statistics and reports are important for admins (e.g., ticket volume, average resolution time)?
+What information should be displayed on user and agent dashboards?
+Should dashboards update in real time or on refresh?
+6. Search, Filtering & Audit Trail
+What fields should be searchable (e.g., ticket ID, title, keywords)?
+What filters are most important for agents and admins?
+What actions should be recorded in the audit trail (e.g., status changes, comments, assignments)?
+7. Security & Compliance
+Are there specific compliance requirements (e.g., GDPR)?
+Should data be encrypted at rest and in transit?
+What measures should be in place to prevent unauthorized access?
+8. Deployment & Maintenance
+Where will the system be hosted (on-premises, Azure, AWS, etc.)?
+How will backups and disaster recovery be handled?
+Who will maintain and update the system after launch?

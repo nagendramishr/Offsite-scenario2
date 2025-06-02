@@ -1,0 +1,57 @@
+@using off2.Data
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext DbContext
+
+@if (auditLogs == null)
+{
+    <p>Loading...</p>
+}
+else if (!auditLogs.Any())
+{
+    <p>No changes recorded.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Action</th>
+                    <th>Field</th>
+                    <th>Old Value</th>
+                    <th>New Value</th>
+                    <th>Changed By</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in auditLogs.OrderByDescending(l => l.ChangedAt))
+                {
+                    <tr>
+                        <td>@log.ChangedAt.ToLocalTime().ToString("g")</td>
+                        <td>@log.Action</td>
+                        <td>@log.FieldName</td>
+                        <td>@(log.OldValue ?? "-")</td>
+                        <td>@(log.NewValue ?? "-")</td>
+                        <td>@(log.ChangedBy?.UserName ?? "-")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int TicketId { get; set; }
+
+    private List<TicketAudit>? auditLogs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        auditLogs = await DbContext.TicketAudits
+            .Include(a => a.ChangedBy)
+            .Where(a => a.TicketId == TicketId)
+            .ToListAsync();
+    }
+}

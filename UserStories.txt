@@ -1,0 +1,52 @@
+User Stories for Ticketing System
+
+Do not use HttpClient or POST from the browser for login.
+Do not use local storage or JS interop for authentication.
+Do not do direct DB access for login in the Blazor component.
+Do use ASP.NET Core authentication (cookie-based) and claims.
+Do use [CascadingParameter] AuthenticationState for user/role info on every page.
+
+
+1. Ticket Management
+- As an end user, I want to create a new support ticket so that I can request help.
+- As an end user, I want to provide a title, description, priority, status, category, attachments, and tech area when creating a ticket so that my issue is clearly described.
+- As an end user, I want to view a list of all my submitted tickets so that I can track their progress.
+- As a support agent, I want to view, filter, and search all tickets so that I can efficiently manage support requests.
+- As a support agent, I want to be assigned tickets and take ownership so that I can resolve issues.
+- As a support agent, I want to update tickets with new information, comments, or status changes so that ticket progress is tracked.
+- As a user or agent, I want to close or reopen tickets as needed so that ticket status reflects reality.
+
+2. User Management & Authentication
+- As a new user, I want to register for an account so that I can access the system.
+- As a user, I want to log in securely so that my data is protected.
+- As an admin, I want to assign roles (End User, Support Agent, Admin) so that users have appropriate permissions.
+- As a user, I want my access and actions to be limited based on my role so that the system is secure.
+- As a user, I want to authenticate using OAuth so that my login is secure.
+- As a user, I cannot reset my password, in accordance with system policy.
+
+3. Communication & Collaboration
+- As a user or agent, I want to add comments to tickets so that communication is clear.
+- As a user or agent, I want to receive notifications when tickets are updated so that I am informed of changes.
+- As a user or agent, I want to attach files or screenshots to tickets so that I can provide more information.
+
+4. Dashboard & Reporting
+- As a user, I want a dashboard showing all my tickets and their statuses so that I can monitor my requests.
+- As a support agent, I want a dashboard showing my assigned and unassigned tickets so that I can manage my workload.
+- As an admin, I want a dashboard with system-wide statistics and reports so that I can monitor support performance.
+- As any user, I want dashboards to update when I refresh the screen so that I see the latest information.
+
+5. Search & Filtering
+- As a user or agent, I want to search tickets by ID, title, status, or keywords so that I can quickly find relevant tickets.
+- As a user or agent, I want to filter tickets by status, priority, assigned agent, or date so that I can focus on specific tickets.
+
+6. Audit Trail
+- As an admin, I want the system to maintain a history of all actions taken on each ticket so that I can review activity for accountability.
+
+7. Security
+- As a user, I want my data and ticket information to be securely stored so that my privacy is protected.
+- As an admin, I want the system to be protected against unauthorized access and data breaches so that the system remains secure.
+
+8. Technical Specifications
+- As a developer, I want the backend implemented in .NET and the database to use SQLite so that the system is lightweight and maintainable.
+- As a user, I want to access the system via a web-based frontend so that it is easily accessible.
+- As an admin, I want the system to be hosted in a self-contained container so that deployment and scaling are simplified.

@@ -1,0 +1,62 @@
+### 1. Ticket Management
+
+#### 1.1 As an end user, I want to create a new support ticket so that I can request help.
+- **Tasks:**
+  - Design a ticket creation form (fields: title, description, priority, status, category, attachments, tech area).
+  - Implement backend API endpoint to create a ticket.
+  - Store ticket in SQLite database with a unique ID.
+  - Validate required fields on submission.
+- **Acceptance Criteria:**
+  - User can submit a ticket with all required fields.
+  - Ticket is saved and assigned a unique ID.
+  - User receives confirmation of ticket creation.
+
+#### 1.2 As an end user, I want to provide a title, description, priority, status, category, attachments, and tech area when creating a ticket so that my issue is clearly described.
+- **Tasks:**
+  - Ensure form includes all specified fields.
+  - Allow file uploads for attachments.
+  - Validate file types and size.
+- **Acceptance Criteria:**
+  - All fields are present and required.
+  - Attachments are uploaded and linked to the ticket.
+
+#### 1.3 As an end user, I want to view a list of all my submitted tickets so that I can track their progress.
+- **Tasks:**
+  - Implement API endpoint to fetch user’s tickets.
+  - Create frontend view to display tickets (with status, priority, etc.).
+- **Acceptance Criteria:**
+  - User sees a list of their tickets with key details.
+  - List updates when a new ticket is created.
+
+#### 1.4 As a support agent, I want to view, filter, and search all tickets so that I can efficiently manage support requests.
+- **Tasks:**
+  - Implement API endpoints for ticket search and filtering.
+  - Build UI for agents to view, filter, and search tickets.
+- **Acceptance Criteria:**
+  - Agent can search by ID, title, status, or keywords.
+  - Agent can filter by status, priority, assigned agent, or date.
+
+#### 1.5 As a support agent, I want to be assigned tickets and take ownership so that I can resolve issues.
+- **Tasks:**
+  - Implement ticket assignment logic (manual or automatic).
+  - Add UI for agents to claim or be assigned tickets.
+- **Acceptance Criteria:**
+  - Agent can see assigned tickets.
+  - Assignment is recorded in the ticket.
+
+#### 1.6 As a support agent, I want to update tickets with new information, comments, or status changes so that ticket progress is tracked.
+- **Tasks:**
+  - Implement API for updating ticket details and adding comments.
+  - Build UI for editing tickets and adding comments.
+- **Acceptance Criteria:**
+  - Agent can update ticket fields and add comments.
+  - Updates are reflected in the ticket history.
+
+#### 1.7 As a user or agent, I want to close or reopen tickets as needed so that ticket status reflects reality.
+- **Tasks:**
+  - Add actions to close or reopen tickets.
+  - Update status in the database and UI.
+- **Acceptance Criteria:**
+  - User or agent can change ticket status to Closed or Open.
+  - Status change is logged in the audit trail.
+  

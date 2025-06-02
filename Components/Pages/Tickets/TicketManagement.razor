@@ -1,0 +1,206 @@
+@page "/tickets/manage"
+@using off2.Data
+@using off2.Data.Enums
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@attribute [Authorize(Roles = "Admin,SupportAgent")]
+
+@inject TicketService TicketService
+@inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
+
+<PageTitle>Manage Tickets</PageTitle>
+
+<h1>Ticket Management</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search by ID, title, or description..." 
+                   @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearch" />
+            <button class="btn btn-outline-secondary" type="button" @onclick="HandleSearch">Search</button>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="btn-group" role="group">
+            <button class="btn @(filterStatus == null ? "btn-primary" : "btn-outline-primary")" @onclick="() => FilterByStatus(null)">All</button>
+            @foreach (var status in Enum.GetValues<TicketStatus>())
+            {
+                var currentStatus = status;
+                <button class="btn @(filterStatus == currentStatus ? "btn-primary" : "btn-outline-primary")" 
+                        @onclick="() => FilterByStatus(currentStatus)">@status</button>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <select class="form-select" @bind="filterPriority" @bind:after="RefreshTickets">
+            <option value="">All Priorities</option>
+            @foreach (var priority in Enum.GetValues<TicketPriority>())
+            {
+                <option value="@priority">@priority</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" @bind="filterAssignee" @bind:after="RefreshTickets">
+            <option value="">All Agents</option>
+            @foreach (var agent in agents)
+            {
+                <option value="@agent.Id">@agent.UserName</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <input type="date" class="form-control" @bind="filterStartDate" @bind:after="RefreshTickets" />
+    </div>
+    <div class="col-md-3">
+        <input type="date" class="form-control" @bind="filterEndDate" @bind:after="RefreshTickets" />
+    </div>
+</div>
+
+@if (tickets == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Created By</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Category</th>
+                    <th>Created</th>
+                    <th>Assigned To</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ticket in filteredTickets)
+                {
+                    <tr>
+                        <td>@ticket.Id</td>
+                        <td>@ticket.Title</td>
+                        <td>@ticket.CreatedBy?.UserName</td>
+                        <td>
+                            <select class="form-select form-select-sm" value="@ticket.Status" 
+                                    @onchange="async (e) => await UpdateStatus(ticket, e)">
+                                @foreach (var status in Enum.GetValues<TicketStatus>())
+                                {
+                                    <option value="@status">@status</option>
+                                }
+                            </select>
+                        </td>
+                        <td><span class="badge bg-@GetPriorityColor(ticket.Priority)">@ticket.Priority</span></td>
+                        <td>@ticket.Category</td>
+                        <td>@ticket.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td>
+                            <select class="form-select form-select-sm" value="@(ticket.AssignedToId ?? string.Empty)" 
+                                    @onchange="async (e) => await AssignTicket(ticket, e)">
+                                <option value="">Unassigned</option>
+                                @foreach (var agent in agents)
+                                {
+                                    <option value="@agent.Id">@agent.UserName</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <a href="@($"tickets/{ticket.Id}")" class="btn btn-sm btn-primary">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {    private List<Ticket>? tickets;
+    private List<ApplicationUser> agents = new();
+    private TicketStatus? filterStatus;
+    private string searchQuery = "";
+    private TicketPriority? filterPriority;
+    private string? filterAssignee;
+    private DateTime? filterStartDate;
+    private DateTime? filterEndDate;
+    private Timer? searchTimer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshTickets();
+        
+        // Get all agents and admins
+        var users = UserManager.Users.ToList();
+        foreach (var user in users)
+        {
+            if (await UserManager.IsInRoleAsync(user, UserRole.SupportAgent.ToString()) ||
+                await UserManager.IsInRoleAsync(user, UserRole.Admin.ToString()))
+            {
+                agents.Add(user);
+            }
+        }
+    }
+
+    private IEnumerable<Ticket> filteredTickets => tickets ?? Enumerable.Empty<Ticket>();
+
+    private async Task RefreshTickets()
+    {
+        tickets = await TicketService.GetTicketsAsync(
+            searchQuery: searchQuery,
+            status: filterStatus,
+            priority: filterPriority,
+            assignedToId: filterAssignee,
+            startDate: filterStartDate,
+            endDate: filterEndDate
+        );
+    }    private async Task HandleSearch()
+    {
+        if (searchTimer != null)
+        {
+            await searchTimer.DisposeAsync();
+        }
+        searchTimer = new Timer(async _ =>
+        {
+            await RefreshTickets();
+            await InvokeAsync(StateHasChanged);
+            searchTimer?.Dispose();
+        }, null, 300, Timeout.Infinite);
+    }
+
+    private void FilterByStatus(TicketStatus? status)
+    {
+        filterStatus = status;
+        _ = RefreshTickets();
+    }
+
+    private async Task UpdateStatus(Ticket ticket, ChangeEventArgs e)
+    {        if (Enum.TryParse<TicketStatus>(e.Value?.ToString(), out var newStatus))
+        {
+            ticket.Status = newStatus;
+            await TicketService.UpdateTicketAsync(ticket);
+            await RefreshTickets();
+        }
+    }
+
+    private async Task AssignTicket(Ticket ticket, ChangeEventArgs e)    {
+        var newAssigneeId = e.Value?.ToString();
+        ticket.AssignedToId = string.IsNullOrEmpty(newAssigneeId) ? null : newAssigneeId;
+        await TicketService.UpdateTicketAsync(ticket);
+        await RefreshTickets();
+    }
+
+    private string GetPriorityColor(TicketPriority priority) => priority switch
+    {
+        TicketPriority.Critical => "danger",
+        TicketPriority.High => "warning",
+        TicketPriority.Medium => "info",
+        TicketPriority.Low => "success",
+        _ => "light"
+    };
+}

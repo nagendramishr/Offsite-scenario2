@@ -1,0 +1,46 @@
+Functional Requirements for a Ticketing System
+
+1. Ticket Management
+- Users can create new support tickets.
+- Each ticket includes: title, description, priority, status, category, attachments, unique ID, and tech area (all text-based).
+- Tickets can have statuses: Open, In Progress, or Closed.
+- Users can view a list of their submitted tickets in all states.
+- Support agents can view, filter, and search all tickets.
+- Tickets can be assigned to support agents, and each agent takes ownership of their assigned tickets.
+- Tickets can be updated with new information, comments, or status changes.
+- Tickets can be closed or reopened as needed.
+
+2. User Management & Authentication
+- Users must register and log in to access the system.
+- Three roles: End User, Support Agent, and Admin.
+- Role-based access control determines ticket visibility and permitted actions.
+- The UI is protected by OAuth authentication for all roles.
+- Users cannot reset their passwords.
+
+3. Communication & Collaboration
+- Users and agents can add comments to tickets.
+- Notifications are sent to users and agents when tickets are updated (e.g., status changes, new comments).
+- Users and agents can attach files or screenshots to tickets.
+
+4. Dashboard & Reporting
+- Users have a dashboard showing all their tickets (open, in progress, closed).
+- Support agents have a dashboard showing assigned and unassigned tickets.
+- Admins have a dashboard with system-wide statistics and reports (e.g., ticket volume, average resolution time).
+- Dashboards update when the user refreshes the screen.
+
+5. Search & Filtering
+- Users and agents can search tickets by ID, title, status, or keywords.
+- Tickets can be filtered by status, priority, assigned agent, or date.
+
+6. Audit Trail
+- The system maintains a history of all actions taken on each ticket (creation, updates, status changes, comments).
+
+7. Security
+- User data and ticket information are securely stored.
+- The system is protected against unauthorized access and data breaches.
+
+8. Technical Specifications
+- Backend is implemented in .NET.
+- SQLite is used as the database.
+- The frontend is web-based.
+- The system is hosted in a self-contained container.

@@ -1,0 +1,103 @@
+﻿@implements IDisposable
+@using off2.Data
+@using off2.Data.Enums
+
+@inject NavigationManager NavigationManager
+@inject RoleHelper RoleHelper
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Support Tickets</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="nav flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <AuthorizeView>
+            <Authorized>
+                @if (isAdmin)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="admin/roles">
+                            <span class="bi bi-person-fill-gear-nav-menu" aria-hidden="true"></span> Role Management
+                        </NavLink>
+                    </div>
+                }
+
+                @if (isAgent || isAdmin)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="tickets/manage">
+                            <span class="bi bi-ticket-detailed-fill-nav-menu" aria-hidden="true"></span> Manage Tickets
+                        </NavLink>
+                    </div>
+                }
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="tickets">
+                        <span class="bi bi-ticket-fill-nav-menu" aria-hidden="true"></span> My Tickets
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="Account/Manage">
+                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="@($"Account/Logout?ReturnUrl={currentUrl}")">
+                        <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+                    </NavLink>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="Account/Register">
+                        <span class="bi bi-person-plus-fill-nav-menu" aria-hidden="true"></span> Register
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="Account/Login">
+                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
+                    </NavLink>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+    </nav>
+</div>
+
+@code {
+    private string? currentUrl;
+    private bool isAdmin;
+    private bool isAgent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+
+        isAdmin = await RoleHelper.IsAdmin();
+        isAgent = await RoleHelper.IsAgent();
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}
+

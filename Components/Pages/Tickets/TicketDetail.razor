@@ -1,0 +1,272 @@
+@page "/tickets/{Id:int}"
+@using off2.Data
+@using off2.Data.Enums
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@attribute [Authorize]
+@inject TicketService TicketService
+@inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>View Ticket</PageTitle>
+
+@if (ticket == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center">
+        <h1>Ticket #@ticket.Id</h1>
+        <div>
+            @if (canEdit)
+            {
+                <button class="btn btn-primary" @onclick="() => isEditing = !isEditing">
+                    @(isEditing ? "Cancel Edit" : "Edit Ticket")
+                </button>
+            }
+            <a href="/tickets" class="btn btn-secondary ms-2">Back to List</a>
+        </div>
+    </div>
+
+    @if (isEditing)
+    {
+        <EditForm Model="@editTicket" OnValidSubmit="@HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group mb-3">
+                <label for="title">Title</label>
+                <InputText id="title" @bind-Value="editTicket.Title" class="form-control" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="description">Description</label>
+                <InputTextArea id="description" @bind-Value="editTicket.Description" class="form-control" rows="5" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="priority">Priority</label>
+                <InputSelect id="priority" @bind-Value="editTicket.Priority" class="form-select">
+                    @foreach (var priority in Enum.GetValues<TicketPriority>())
+                    {
+                        <option value="@priority">@priority</option>
+                    }
+                </InputSelect>
+            </div>
+
+            @if (isAgent)
+            {
+                <div class="form-group mb-3">
+                    <label for="status">Status</label>
+                    <InputSelect id="status" @bind-Value="editTicket.Status" class="form-select">
+                        @foreach (var status in Enum.GetValues<TicketStatus>())
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </InputSelect>
+                </div>
+            }
+
+            <div class="form-group mb-3">
+                <label for="category">Category</label>
+                <InputText id="category" @bind-Value="editTicket.Category" class="form-control" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="techArea">Technical Area</label>
+                <InputText id="techArea" @bind-Value="editTicket.TechArea" class="form-control" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </EditForm>
+    }
+    else
+    {
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4 class="card-title">@ticket.Title</h4>
+                        <p class="card-text">@ticket.Description</p>
+                    </div>
+                    <div class="col-md-4">
+                        <dl class="row">
+                            <dt class="col-sm-4">Status</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-@GetStatusColor(ticket.Status)">@ticket.Status</span>
+                            </dd>
+
+                            <dt class="col-sm-4">Priority</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-@GetPriorityColor(ticket.Priority)">@ticket.Priority</span>
+                            </dd>
+
+                            <dt class="col-sm-4">Category</dt>
+                            <dd class="col-sm-8">@ticket.Category</dd>
+
+                            <dt class="col-sm-4">Tech Area</dt>
+                            <dd class="col-sm-8">@(ticket.TechArea ?? "-")</dd>
+
+                            <dt class="col-sm-4">Created</dt>
+                            <dd class="col-sm-8">@ticket.CreatedAt.ToLocalTime().ToString("g")</dd>
+
+                            <dt class="col-sm-4">Created By</dt>
+                            <dd class="col-sm-8">@ticket.CreatedBy?.UserName</dd>
+
+                            <dt class="col-sm-4">Assigned To</dt>
+                            <dd class="col-sm-8">@(ticket.AssignedTo?.UserName ?? "Unassigned")</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(ticket.AttachmentUrl))
+        {
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Attachment</h5>
+                </div>
+                <div class="card-body">
+                    <a href="@ticket.AttachmentUrl" target="_blank" class="btn btn-outline-primary">
+                        <i class="bi bi-download"></i> Download Attachment
+                    </a>
+                </div>
+            </div>        }        @if (ticket.Comments != null && ticket.Comments.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Comments</h5>
+                </div>
+                <div class="card-body">
+                    @foreach (var comment in ticket.Comments.OrderByDescending(c => c.CreatedAt))
+                    {
+                        <div class="border-bottom mb-3 pb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    @comment.CreatedBy?.UserName - @comment.CreatedAt.ToLocalTime().ToString("g")
+                                </small>
+                            </div>
+                            <p class="mb-0 mt-2">@comment.Content</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Add Comment</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <textarea class="form-control" rows="3" placeholder="Type your comment here..."
+                            @bind="newComment"></textarea>
+                </div>
+                <button class="btn btn-primary mt-3" @onclick="AddComment" disabled="@(string.IsNullOrWhiteSpace(newComment))">
+                    Add Comment
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Ticket History</h5>
+            </div>
+            <div class="card-body">
+                <TicketAuditLog TicketId="@ticket.Id" />
+            </div>
+        </div>
+    }
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Ticket? ticket;
+    private Ticket? editTicket;
+    private bool isEditing;
+    private bool canEdit;
+    private bool isAgent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ticket = await TicketService.GetTicketByIdAsync(Id);
+        if (ticket != null)
+        {
+            // Create a clone for editing
+            editTicket = new Ticket
+            {
+                Id = ticket.Id,
+                Title = ticket.Title,
+                Description = ticket.Description,
+                Priority = ticket.Priority,
+                Status = ticket.Status,
+                Category = ticket.Category,
+                TechArea = ticket.TechArea,
+                AttachmentUrl = ticket.AttachmentUrl,
+                CreatedById = ticket.CreatedById,
+                AssignedToId = ticket.AssignedToId
+            };
+
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = await UserManager.GetUserAsync(authState.User);
+            
+            if (user != null)
+            {
+                isAgent = await UserManager.IsInRoleAsync(user, UserRole.Admin.ToString()) ||
+                         await UserManager.IsInRoleAsync(user, UserRole.SupportAgent.ToString());
+                canEdit = isAgent || ticket.CreatedById == user.Id;
+            }
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {        if (editTicket != null)
+        {
+            await TicketService.UpdateTicketAsync(editTicket);
+            ticket = await TicketService.GetTicketByIdAsync(Id); // Refresh
+            isEditing = false;
+        }
+    }
+
+    private string newComment = "";
+
+    private async Task AddComment()
+    {
+        if (!string.IsNullOrWhiteSpace(newComment) && ticket != null)
+        {
+            var comment = new TicketComment
+            {
+                TicketId = ticket.Id,
+                Content = newComment
+            };
+
+            await TicketService.AddCommentAsync(comment);
+            ticket = await TicketService.GetTicketByIdAsync(Id); // Refresh
+            newComment = ""; // Clear the input
+        }
+    }
+
+    private string GetStatusColor(TicketStatus status) => status switch
+    {
+        TicketStatus.Open => "primary",
+        TicketStatus.InProgress => "info",
+        TicketStatus.OnHold => "warning",
+        TicketStatus.Resolved => "success",
+        TicketStatus.Closed => "secondary",
+        _ => "light"
+    };
+
+    private string GetPriorityColor(TicketPriority priority) => priority switch
+    {
+        TicketPriority.Critical => "danger",
+        TicketPriority.High => "warning",
+        TicketPriority.Medium => "info",
+        TicketPriority.Low => "success",
+        _ => "light"
+    };
+}

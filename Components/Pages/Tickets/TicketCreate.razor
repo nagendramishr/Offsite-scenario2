@@ -1,0 +1,114 @@
+@page "/tickets/create"
+@using off2.Data
+@using off2.Data.Enums
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@inject TicketService TicketService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create Ticket</PageTitle>
+
+<h1>Create New Support Ticket</h1>
+
+<EditForm Model="@ticket" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group mb-3">
+        <label for="title">Title</label>
+        <InputText id="title" @bind-Value="ticket.Title" class="form-control" />
+        <ValidationMessage For="@(() => ticket.Title)" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="description">Description</label>
+        <InputTextArea id="description" @bind-Value="ticket.Description" class="form-control" rows="5" />
+        <ValidationMessage For="@(() => ticket.Description)" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="priority">Priority</label>
+        <InputSelect id="priority" @bind-Value="ticket.Priority" class="form-select">
+            @foreach (var priority in Enum.GetValues<TicketPriority>())
+            {
+                <option value="@priority">@priority</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="category">Category</label>
+        <InputText id="category" @bind-Value="ticket.Category" class="form-control" />
+        <ValidationMessage For="@(() => ticket.Category)" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="techArea">Technical Area</label>
+        <InputText id="techArea" @bind-Value="ticket.TechArea" class="form-control" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="attachment">Attachment</label>
+        <InputFile OnChange="@LoadFiles" class="form-control" accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx" />
+        @if (!string.IsNullOrEmpty(uploadMessage))
+        {
+            <div class="alert alert-info mt-2">@uploadMessage</div>
+        }
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Create Ticket</button>
+        <a href="/tickets" class="btn btn-secondary ms-2">Cancel</a>
+    </div>
+</EditForm>
+
+@code {
+    private Ticket ticket = new();
+    private string? uploadMessage;
+    private const int maxFileSize = 10 * 1024 * 1024; // 10MB
+    private readonly string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".doc", ".docx" };
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var extension = Path.GetExtension(file.Name).ToLowerInvariant();
+
+        if (!allowedExtensions.Contains(extension))
+        {
+            uploadMessage = "Invalid file type. Please upload a .jpg, .jpeg, .png, .gif, .pdf, .doc, or .docx file.";
+            return;
+        }
+
+        if (file.Size > maxFileSize)
+        {
+            uploadMessage = "File size must be less than 10MB.";
+            return;
+        }
+
+        // Create a unique file name
+        var fileName = $"{Guid.NewGuid()}{extension}";
+        var path = Path.Combine("wwwroot", "uploads", fileName);
+        Directory.CreateDirectory(Path.Combine("wwwroot", "uploads")); // Ensure directory exists
+
+        await using var stream = file.OpenReadStream(maxFileSize);
+        await using var fileStream = File.Create(path);
+        await stream.CopyToAsync(fileStream);
+
+        ticket.AttachmentUrl = $"/uploads/{fileName}";
+        uploadMessage = "File uploaded successfully.";
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await TicketService.CreateTicketAsync(ticket);
+            NavigationManager.NavigateTo("/tickets");
+        }
+        catch (Exception)
+        {
+            // Log error
+            uploadMessage = "Error creating ticket. Please try again.";
+        }
+    }
+}
