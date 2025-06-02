@@ -1,4 +1,6 @@
 ## .NET 9, .NET Core, and Visual Studio
+appsettings.json
+appsettings.*.json
 bin/
 obj/
 out/
