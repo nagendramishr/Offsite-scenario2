@@ -2,6 +2,7 @@
 @using off2.Data
 @using off2.Data.Enums
 @using Microsoft.AspNetCore.Authorization
+@using System.ComponentModel.DataAnnotations
 @attribute [Authorize]
 @inject TicketService TicketService
 @inject NavigationManager NavigationManager
@@ -10,25 +11,25 @@
 
 <h1>Create New Support Ticket</h1>
 
-<EditForm Model="@ticket" OnValidSubmit="@HandleValidSubmit">
+<EditForm Model="@formModel" OnValidSubmit="@HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="form-group mb-3">
         <label for="title">Title</label>
-        <InputText id="title" @bind-Value="ticket.Title" class="form-control" />
-        <ValidationMessage For="@(() => ticket.Title)" />
+        <InputText id="title" @bind-Value="formModel.Title" class="form-control" />
+        <ValidationMessage For="@(() => formModel.Title)" />
     </div>
 
     <div class="form-group mb-3">
         <label for="description">Description</label>
-        <InputTextArea id="description" @bind-Value="ticket.Description" class="form-control" rows="5" />
-        <ValidationMessage For="@(() => ticket.Description)" />
+        <InputTextArea id="description" @bind-Value="formModel.Description" class="form-control" rows="5" />
+        <ValidationMessage For="@(() => formModel.Description)" />
     </div>
 
     <div class="form-group mb-3">
         <label for="priority">Priority</label>
-        <InputSelect id="priority" @bind-Value="ticket.Priority" class="form-select">
+        <InputSelect id="priority" @bind-Value="formModel.Priority" class="form-select">
             @foreach (var priority in Enum.GetValues<TicketPriority>())
             {
                 <option value="@priority">@priority</option>
@@ -38,13 +39,13 @@
 
     <div class="form-group mb-3">
         <label for="category">Category</label>
-        <InputText id="category" @bind-Value="ticket.Category" class="form-control" />
-        <ValidationMessage For="@(() => ticket.Category)" />
+        <InputText id="category" @bind-Value="formModel.Category" class="form-control" />
+        <ValidationMessage For="@(() => formModel.Category)" />
     </div>
 
     <div class="form-group mb-3">
         <label for="techArea">Technical Area</label>
-        <InputText id="techArea" @bind-Value="ticket.TechArea" class="form-control" />
+        <InputText id="techArea" @bind-Value="formModel.TechArea" class="form-control" />
     </div>
 
     <div class="form-group mb-3">
@@ -63,7 +64,24 @@
 </EditForm>
 
 @code {
-    private Ticket ticket = new();
+    // Use a view model for the form that does not include CreatedById
+    private class TicketCreateModel
+    {
+        [Required]
+        [StringLength(200)]
+        public string Title { get; set; } = "";
+        [Required]
+        public string Description { get; set; } = "";
+        public TicketPriority Priority { get; set; } = TicketPriority.Medium;
+        [Required]
+        [StringLength(100)]
+        public string Category { get; set; } = "";
+        [StringLength(100)]
+        public string? TechArea { get; set; }
+        public string? AttachmentUrl { get; set; }
+    }
+
+    private TicketCreateModel formModel = new();
     private string? uploadMessage;
     private const int maxFileSize = 10 * 1024 * 1024; // 10MB
     private readonly string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".doc", ".docx" };
@@ -94,7 +112,7 @@
         await using var fileStream = File.Create(path);
         await stream.CopyToAsync(fileStream);
 
-        ticket.AttachmentUrl = $"/uploads/{fileName}";
+        formModel.AttachmentUrl = $"/uploads/{fileName}";
         uploadMessage = "File uploaded successfully.";
     }
 
@@ -102,12 +120,20 @@
     {
         try
         {
+            var ticket = new Ticket
+            {
+                Title = formModel.Title,
+                Description = formModel.Description,
+                Priority = formModel.Priority,
+                Category = formModel.Category,
+                TechArea = formModel.TechArea,
+                AttachmentUrl = formModel.AttachmentUrl
+            };
             await TicketService.CreateTicketAsync(ticket);
             NavigationManager.NavigateTo("/tickets");
         }
         catch (Exception)
         {
-            // Log error
             uploadMessage = "Error creating ticket. Please try again.";
         }
     }

@@ -10,6 +10,7 @@
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject IConfiguration Configuration
 
 <PageTitle>Log in</PageTitle>
 
@@ -56,7 +57,30 @@
         <section>
             <h3>Use another service to log in.</h3>
             <hr />
-            <ExternalLoginPicker />
+            @if (!string.IsNullOrWhiteSpace(Configuration["Authentication:Microsoft:ClientId"]) && !string.IsNullOrWhiteSpace(Configuration["Authentication:Microsoft:ClientSecret"]))
+            {
+                <form class="d-inline" action="Account/PerformExternalLogin" method="post">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
+                    <button type="submit" class="btn btn-primary" name="provider" value="Microsoft">Microsoft</button>
+                </form>
+            }
+            @if (!string.IsNullOrWhiteSpace(Configuration["Authentication:Google:ClientId"]) && !string.IsNullOrWhiteSpace(Configuration["Authentication:Google:ClientSecret"]))
+            {
+                <form class="d-inline" action="Account/PerformExternalLogin" method="post">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
+                    <button type="submit" class="btn btn-primary" name="provider" value="Google">Google</button>
+                </form>
+            }
+            @if (string.IsNullOrWhiteSpace(Configuration["Authentication:Microsoft:ClientId"]) && string.IsNullOrWhiteSpace(Configuration["Authentication:Google:ClientId"]))
+            {
+                <div>
+                    <p>
+                        There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article about setting up this ASP.NET application to support logging in via external services</a>.
+                    </p>
+                </div>
+            }
         </section>
     </div>
 </div>
