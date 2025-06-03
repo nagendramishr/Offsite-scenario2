@@ -1,0 +1,257 @@
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Web
+@using off2
+@using off2.Data
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Rendering
+
+@inject IChatService ChatService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IConfiguration Configuration
+
+<div class="chat-assistant-container">
+    <div class="chat-header">
+        <span>@(isLocalChat ? "Keyword Chat Assistant" : "AI Chat Assistant")</span>
+    </div>
+    <div class="chat-description" style="padding:0.5rem 1rem; color:#555; font-size:1rem;">
+        This is a <b>keyword-based chat assistant</b>. As you type, the assistant will suggest up to 10 matching keywords. When you send a message, the service will find and return articles based on keyword matches.
+    </div>
+    <div class="chat-history">
+        @foreach (var msg in Messages)
+        {
+            <div class="chat-message @(msg.IsUser ? "user-msg" : "ai-msg")">
+                <div class="chat-bubble">
+                    @if (!msg.IsUser && msg.IsSupportArticle)
+                    {
+                        <div style="font-size:0.98em; color:#444; margin-bottom:0.3em;">
+                            <b>Based on your keyword, here is the support article:</b>
+                        </div>
+                        @((MarkupString)msg.Text)
+                    }
+                    else
+                    {
+                        @msg.Text
+                    }
+                </div>
+                <div class="chat-avatar">
+                    <img src="/favicon.png" alt="avatar" />
+                </div>
+            </div>
+        }
+    </div>
+    <div class="chat-input-row">
+        <input class="chat-input"
+               value="@UserInput"
+               @oninput="HandleInput"
+               @onkeypress="HandleKeyPress"
+               placeholder="Type a message..." />
+        <button class="chat-send-btn" @onclick="SendMessage" disabled="@IsSending">
+            <span class="bi bi-send"></span>
+        </button>
+    </div>
+    <ul>
+        @if (MatchingKeywords.Any())
+        {
+            foreach (var keyword in MatchingKeywords.Take(10))
+            {
+                <li @onclick="() => SelectKeyword(keyword)">@keyword</li>
+            }
+            if (MatchingKeywords.Count > 10)
+            {
+                <li style="color:#888;font-size:0.95em;">...and @(MatchingKeywords.Count-10) more</li>
+            }
+        }
+    </ul>
+    <div>
+        <h3>Available Keywords:</h3>
+        <div style="color:#555; font-size:1rem;">There are <b>@(Keywords?.Count ?? 0)</b> unique keywords available for matching.</div>
+    </div>
+</div>
+
+<style>
+.chat-assistant-container {
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    max-width: 600px;
+    margin: 2rem auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+.chat-header {
+    padding: 1rem;
+    background: #f5f7fa;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+.chat-description {
+    padding: 0.5rem 1rem;
+    color: #555;
+    font-size: 1rem;
+}
+.chat-history {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: #f9fbfd;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.chat-message {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 0.5rem;
+}
+.user-msg {
+    flex-direction: row-reverse;
+}
+.ai-msg {
+    flex-direction: row;
+}
+.chat-bubble {
+    background: #e3f0ff;
+    color: #222;
+    padding: 0.7rem 1.1rem;
+    border-radius: 1.2rem;
+    max-width: 70%;
+    font-size: 1rem;
+    margin: 0 0.5rem;
+}
+.user-msg .chat-bubble {
+    background: #4f8cff;
+    color: #fff;
+}
+.chat-avatar img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.chat-input-row {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-top: 1px solid #e0e0e0;
+    background: #f5f7fa;
+}
+.chat-input {
+    flex: 1;
+    border: none;
+    border-radius: 1.2rem;
+    padding: 0.7rem 1.1rem;
+    font-size: 1rem;
+    background: #f0f4fa;
+    margin-right: 0.5rem;
+}
+.chat-input:focus {
+    outline: none;
+    background: #e3f0ff;
+}
+.chat-send-btn {
+    background: #4f8cff;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.chat-send-btn:disabled {
+    background: #b3cfff;
+    cursor: not-allowed;
+}
+</style>
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+
+    private List<ChatMessage> Messages = new();
+    private string? UserInput;
+    private bool IsSending;
+    private ClaimsPrincipal? User;
+    private bool isLocalChat;
+    private List<string> MatchingKeywords = new();
+    private List<string> Keywords = new();
+
+    protected override void OnInitialized()
+    {
+        var authState = AuthStateProvider.GetAuthenticationStateAsync().Result;
+        User = authState.User;
+        isLocalChat = Configuration.GetValue<bool>("Chat:UseLocalChat");
+        Keywords = ChatService.GetMatchingKeywords(""); // Fetch all keywords
+        MatchingKeywords = new List<string>(Keywords);
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(UserInput)) return;
+        Messages.Add(new ChatMessage { Text = UserInput!, IsUser = true });
+        var input = UserInput;
+        UserInput = string.Empty;
+        IsSending = true;
+        StateHasChanged();
+        var response = await ChatService.GetChatResponseAsync(input!, User);
+        // Detect if this is a support article (not a fallback message)
+        bool isSupportArticle = !(response?.StartsWith("Sorry, I couldn't find") ?? true);
+        Messages.Add(new ChatMessage { Text = response, IsUser = false, IsSupportArticle = isSupportArticle });
+        IsSending = false;
+        StateHasChanged();
+    }
+
+    private void Close() => IsOpenChanged.InvokeAsync(false);
+
+    private void HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            _ = SendMessage();
+        }
+    }
+
+    private void HandleInput(ChangeEventArgs e)
+    {
+        UserInput = e.Value?.ToString() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(UserInput))
+        {
+            MatchingKeywords = new List<string>(Keywords);
+        }
+        else if (UserInput.Length >= 3)
+        {
+            MatchingKeywords = ChatService.GetMatchingKeywords(UserInput);
+        }
+        else
+        {
+            MatchingKeywords.Clear();
+        }
+        StateHasChanged();
+    }
+
+    private void SelectKeyword(string keyword)
+    {
+        UserInput = keyword;
+        MatchingKeywords.Clear();
+        StateHasChanged();
+    }
+
+    private class ChatMessage
+    {
+        public required string Text { get; set; }
+        public bool IsUser { get; set; }
+        public bool IsSupportArticle { get; set; } = false;
+    }
+}
+
+
