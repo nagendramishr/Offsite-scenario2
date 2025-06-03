@@ -1,0 +1,96 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@using off2.Data
+@inject NotificationService NotificationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+<div class="dropdown">
+    <button class="btn btn-link nav-link dropdown-toggle" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-bell"></i>
+        @if (unreadCount > 0)
+        {
+            <span class="badge bg-danger">@unreadCount</span>
+        }
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" style="width: 300px;" aria-labelledby="notificationDropdown">
+        <li>
+            <h6 class="dropdown-header">Notifications</h6>
+        </li>
+        @if (!notifications.Any())
+        {
+            <li><span class="dropdown-item text-muted">No unread notifications</span></li>
+        }
+        else
+        {
+            foreach (var notification in notifications)
+            {
+                <li>
+                    <a class="dropdown-item" href="#" @onclick="() => HandleNotificationClick(notification)" @onclick:preventDefault>
+                        <div class="d-flex w-100 justify-content-between">
+                            <small class="text-muted">@notification.CreatedAt.ToLocalTime().ToString("g")</small>
+                        </div>
+                        <p class="mb-1">@notification.Message</p>
+                    </a>
+                </li>
+            }
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <a class="dropdown-item text-primary" href="/notifications">
+                    View All Notifications
+                </a>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    private List<Notification> notifications = new();
+    private string? userId;
+    private int unreadCount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId != null)
+        {
+            await LoadNotifications();
+            NotificationService.Subscribe(userId, HandleNewNotification);
+        }
+    }
+
+    private async Task LoadNotifications()
+    {
+        if (userId == null) return;
+
+        notifications = await NotificationService.GetUnreadNotificationsAsync(userId);
+        unreadCount = notifications.Count;
+        StateHasChanged();
+    }
+
+    private async Task HandleNotificationClick(Notification notification)
+    {
+        await NotificationService.MarkAsReadAsync(notification.Id);
+        NavigationManager.NavigateTo($"/tickets/{notification.TicketId}");
+    }
+
+    private void HandleNewNotification(Notification notification)
+    {
+        notifications.Insert(0, notification);
+        unreadCount++;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (userId != null)
+        {
+            NotificationService.Unsubscribe(userId);
+        }
+    }
+}

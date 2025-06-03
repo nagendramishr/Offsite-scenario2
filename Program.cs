@@ -4,16 +4,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.Sqlite;
 using System.Runtime.Versioning;
 using off2.Components;
 using off2.Components.Account;
 using off2.Data;
-using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,6 +72,9 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 // Register services
 builder.Services.AddScoped<RoleHelper>();
 builder.Services.AddScoped<TicketService>();
+builder.Services.AddScoped<CommentService>();
+builder.Services.AddScoped<AttachmentService>();
+builder.Services.AddScoped<NotificationService>();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 

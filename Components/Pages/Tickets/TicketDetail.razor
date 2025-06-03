@@ -1,13 +1,26 @@
 @page "/tickets/{Id:int}"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.JSInterop
+@using System
+@using System.ComponentModel.DataAnnotations
 @using off2.Data
 @using off2.Data.Enums
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Identity
+@using off2.Data.Models
+@using off2.Components
 @attribute [Authorize]
 @inject TicketService TicketService
 @inject NavigationManager NavigationManager
 @inject UserManager<ApplicationUser> UserManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
+@inject CommentService CommentService
+@implements IDisposable
 
 <PageTitle>View Ticket</PageTitle>
 
@@ -121,20 +134,14 @@ else
                     </div>
                 </div>
             </div>
-        </div>
-
-        @if (!string.IsNullOrEmpty(ticket.AttachmentUrl))
-        {
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Attachment</h5>
-                </div>
-                <div class="card-body">
-                    <a href="@ticket.AttachmentUrl" target="_blank" class="btn btn-outline-primary">
-                        <i class="bi bi-download"></i> Download Attachment
-                    </a>
-                </div>
-            </div>        }        @if (ticket.Comments != null && ticket.Comments.Any())
+        </div>        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Attachments</h5>
+            </div>
+            <div class="card-body">
+                <AttachmentList TicketId="@ticket.Id" />
+            </div>
+        </div>@if (ticket.Comments != null && ticket.Comments.Any())
         {
             <div class="card mb-4">
                 <div class="card-header">
@@ -178,8 +185,7 @@ else
             <div class="card-body">
                 <TicketAuditLog TicketId="@ticket.Id" />
             </div>
-        </div>
-    }
+        </div>    }
 }
 
 @code {
@@ -190,11 +196,11 @@ else
     private Ticket? editTicket;
     private bool isEditing;
     private bool canEdit;
-    private bool isAgent;
-
-    protected override async Task OnInitializedAsync()
+    private bool isAgent;    protected override async Task OnInitializedAsync()
     {
-        ticket = await TicketService.GetTicketByIdAsync(Id);
+        CommentService.CommentsChanged += HandleCommentsChanged;
+        
+        await LoadTicket();
         if (ticket != null)
         {
             // Create a clone for editing
@@ -259,9 +265,7 @@ else
         TicketStatus.Resolved => "success",
         TicketStatus.Closed => "secondary",
         _ => "light"
-    };
-
-    private string GetPriorityColor(TicketPriority priority) => priority switch
+    };    private string GetPriorityColor(TicketPriority priority) => priority switch
     {
         TicketPriority.Critical => "danger",
         TicketPriority.High => "warning",
@@ -269,4 +273,22 @@ else
         TicketPriority.Low => "success",
         _ => "light"
     };
+
+    private async Task LoadTicket()
+    {
+        ticket = await TicketService.GetTicketByIdAsync(Id);
+    }
+
+    private void HandleCommentsChanged(int ticketId)
+    {
+        if (ticketId == Id)
+        {
+            InvokeAsync(LoadTicket);
+        }
+    }
+
+    public void Dispose()
+    {
+        CommentService.CommentsChanged -= HandleCommentsChanged;
+    }
 }

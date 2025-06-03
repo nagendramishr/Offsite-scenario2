@@ -1,0 +1,129 @@
+Story 3: Communication & Collaboration Tasks
+
+1. Ticket Comments Implementation
+   a. Database
+      - [x] Verify TicketComment table exists with fields:
+        * ID (primary key)
+        * TicketId (foreign key to Tickets)
+        * CommentText
+        * CreatedBy (foreign key to Users)
+        * CreatedAt
+        * LastModifiedAt
+        * IsEdited (boolean)
+
+   b. Backend
+      - [ ] Create CommentService class with methods:
+        * AddComment(ticketId, text, userId)
+        * GetCommentsForTicket(ticketId)
+        * EditComment(commentId, newText)
+        * DeleteComment(commentId)
+      - [ ] Add authorization checks to ensure only comment creators can edit/delete their comments
+      - [ ] Implement audit logging for comment actions
+      - [ ] Add API endpoints for comment operations
+
+   c. Frontend
+      - [ ] Create CommentList component to display comments
+      - [ ] Add comment form component with text editor
+      - [ ] Implement edit/delete functionality for comments
+      - [ ] Show comment metadata (author, timestamp, edited status)
+      - [ ] Add real-time comment updates using SignalR
+
+2. File Attachments System
+   a. Storage Setup
+      - [ ] Configure file storage in wwwroot/uploads with proper permissions
+      - [ ] Create subdirectories for different file types
+      - [ ] Set up file size limits and allowed file types in configuration
+
+   b. Database
+      - [ ] Create TicketAttachment table with fields:
+        * ID (primary key)
+        * TicketId (foreign key)
+        * FileName
+        * FileSize
+        * ContentType
+        * UploadedBy (foreign key to Users)
+        * UploadedAt
+        * FilePath
+
+   c. Backend
+      - [ ] Create AttachmentService with methods:
+        * UploadFile(ticketId, file, userId)
+        * DeleteFile(attachmentId)
+        * GetAttachmentsForTicket(ticketId)
+      - [ ] Implement file type validation
+      - [ ] Add virus scanning for uploaded files (optional)
+      - [ ] Set up secure file access controls
+      - [ ] Implement file cleanup for deleted tickets
+
+   d. Frontend
+      - [ ] Create file upload component
+      - [ ] Add drag-and-drop support
+      - [ ] Show upload progress
+      - [ ] Display attachment list with thumbnails for images
+      - [ ] Add download functionality
+      - [ ] Implement delete attachment option for authorized users
+
+3. Notification System
+   a. Database
+      - [ ] Create Notification table with fields:
+        * ID (primary key)
+        * UserId (foreign key)
+        * TicketId (foreign key)
+        * Type (enum: Comment, Status, Assignment, etc.)
+        * Message
+        * CreatedAt
+        * IsRead
+        * ReadAt
+
+   b. Backend
+      - [ ] Create NotificationService with methods:
+        * CreateNotification(userId, ticketId, type, message)
+        * MarkAsRead(notificationId)
+        * GetUnreadNotifications(userId)
+        * DeleteNotification(notificationId)
+      - [ ] Implement SignalR hub for real-time notifications
+      - [ ] Set up notification triggers for:
+        * New comments
+        * Status changes
+        * Assignment changes
+        * Priority changes
+      - [ ] Add email notification support (optional)
+
+   c. Frontend
+      - [ ] Create notification bell component
+      - [ ] Show unread notification count
+      - [ ] Add notification dropdown/panel
+      - [ ] Implement real-time notification updates
+      - [ ] Add notification preferences page
+      - [ ] Show notifications in-page for ticket updates
+
+4. Integration Tasks
+   - [ ] Add comments section to ticket detail page
+   - [ ] Integrate file upload in ticket create/edit forms
+   - [ ] Add notifications panel to main layout
+   - [ ] Implement real-time updates across all components
+   - [ ] Add email templates for notifications (optional)
+
+5. Testing
+   - [ ] Unit tests for all services
+   - [ ] Integration tests for file uploads
+   - [ ] Test notification delivery
+   - [ ] Test real-time updates
+   - [ ] Security testing for file uploads
+   - [ ] Performance testing for large files
+   - [ ] Test concurrent comment additions
+
+6. Documentation
+   - [ ] Document file size limits and allowed types
+   - [ ] Add API documentation for new endpoints
+   - [ ] Document notification types and triggers
+   - [ ] Create user guide for attachment features
+   - [ ] Document real-time functionality
+
+7. Security Considerations
+   - [ ] Implement file type validation
+   - [ ] Add anti-virus scanning for uploads
+   - [ ] Secure file storage paths
+   - [ ] Add rate limiting for uploads
+   - [ ] Implement proper authorization for all operations
+   - [ ] Add CSRF protection for uploads

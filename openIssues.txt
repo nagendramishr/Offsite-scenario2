@@ -1,0 +1,89 @@
+1. Real-time Updates Issue:
+- Issue: Comments don't auto-update across user sessions
+- Status: Open
+- Referenced in: Story 3 tasks [Task 1.c] "Add real-time comment updates using SignalR"
+- Priority: High (affects core collaboration functionality)
+
+2. Notification System:
+- Issue: Incomplete notification implementation
+- Status: Open
+- Referenced in: Story 3 tasks [Task 3] "Notification System"
+- Sub-tasks pending:
+  * Real-time notification updates
+  * Email notifications (optional)
+  * In-page updates for ticket changes
+
+3. File Attachments:
+- Issue: File upload system incomplete
+- Status: Open
+- Referenced in: Story 3 tasks [Task 2]
+- Missing features:
+  * File size limits
+  * File type validation
+  * Secure file storage
+  * Upload progress indicators
+  * Preview/thumbnails
+
+4. Dashboard & Reporting:
+- Issue: Dashboard updates not real-time
+- Status: Open
+- Referenced in: UserStories.txt [Section 4]
+- Note: Currently requires manual refresh
+
+5. Security Concerns:
+- Issue: Security measures need implementation
+- Status: Open
+- Referenced in: Story 3 tasks [Task 7]
+- Missing:
+  * File upload security
+  * Rate limiting
+  * CSRF protection
+  * Anti-virus scanning
+
+6. Testing Coverage:
+- Issue: Missing test coverage
+- Status: Open
+- Referenced in: Story 3 tasks [Task 5]
+- Needed:
+  * Unit tests for services
+  * Integration tests
+  * Real-time functionality tests
+  * Concurrent operations testing
+
+7. Documentation:
+- Issue: Incomplete documentation
+- Status: Open
+- Referenced in: Story 3 tasks [Task 6]
+- Missing:
+  * API documentation
+  * User guides
+  * System limits documentation
+
+8. AI Assistant Integration:
+- Issue: Need to add OpenAI-powered support assistant
+- Status: Open
+- Referenced in: Scenario 2 "Contoso Support chat conversation"
+- Components needed:
+  * Azure OpenAI Service integration
+  * Three specialized agents:
+    - Resolution Retriever: Fetches relevant ticket resolution history
+    - Suggestion Generator: Provides support suggestions based on similar tickets
+    - Conversation Manager: Summarizes information and guides conversation
+  * Vector database for semantic search of tickets (Azure Cognitive Search)
+  * Chat interface components:
+    - Chat window component
+    - Message thread display
+    - Real-time response streaming
+    - Conversation history management
+  * Integration points:
+    - Ticket history access
+    - User authentication context
+    - Notification system for chat alerts
+    - Document/knowledge base integration
+- Priority: Medium (enhancement to existing system)
+- Security considerations:
+  * AI service authentication
+  * Conversation data privacy
+  * Rate limiting and token management
+  * Data retention policies
+

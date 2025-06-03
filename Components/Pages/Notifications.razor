@@ -1,0 +1,91 @@
+@page "/notifications"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@using off2.Data
+@attribute [Authorize]
+@inject NotificationService NotificationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>Notifications</PageTitle>
+
+<div class="container mt-4">
+    <h1>Notifications</h1>
+
+    @if (notifications == null)
+    {
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    }
+    else if (!notifications.Any())
+    {
+        <p class="text-muted">No notifications</p>
+    }
+    else
+    {
+        <div class="list-group">
+            @foreach (var notification in notifications)
+            {
+                <a href="/tickets/@notification.TicketId" class="list-group-item list-group-item-action @(!notification.IsRead ? "active" : "")"
+                   @onclick="() => HandleNotificationClick(notification)" @onclick:preventDefault>
+                    <div class="d-flex w-100 justify-content-between">
+                        <small>@notification.CreatedAt.ToLocalTime().ToString("g")</small>
+                        @if (!notification.IsRead)
+                        {
+                            <span class="badge bg-primary">New</span>
+                        }
+                    </div>
+                    <p class="mb-1">@notification.Message</p>
+                </a>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<Notification>? notifications;
+    private string? userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId != null)
+        {
+            await LoadNotifications();
+            NotificationService.Subscribe(userId, HandleNewNotification);
+        }
+    }
+
+    private async Task LoadNotifications()
+    {
+        if (userId == null) return;
+
+        notifications = await NotificationService.GetUnreadNotificationsAsync(userId);
+        StateHasChanged();
+    }
+
+    private async Task HandleNotificationClick(Notification notification)
+    {
+        await NotificationService.MarkAsReadAsync(notification.Id);
+        NavigationManager.NavigateTo($"/tickets/{notification.TicketId}");
+    }
+
+    private void HandleNewNotification(Notification notification)
+    {
+        if (notifications == null) notifications = new List<Notification>();
+        notifications.Insert(0, notification);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (userId != null)
+        {
+            NotificationService.Unsubscribe(userId);
+        }
+    }
+}
