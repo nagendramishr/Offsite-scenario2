@@ -1,0 +1,12 @@
+# Navigation
+## Description
+Blazor supports navigation using the `NavigationManager` service.
+
+## Resolution
+To resolve navigation issues:
+1. Use `NavigationManager.NavigateTo` for programmatic navigation.
+2. Handle route parameters using the `@page` directive.
+3. Debug navigation issues using browser tools.
+4. Test navigation using unit tests.
+
+For more details, refer to the official Blazor navigation documentation.

@@ -1,0 +1,12 @@
+# Data Binding
+## Description
+Blazor supports two-way data binding using the `@bind` directive.
+
+## Resolution
+To resolve data binding issues:
+1. Ensure the property has both `get` and `set` accessors.
+2. Use `@bind-Value` for specific input types.
+3. Debug binding issues using browser tools.
+4. Avoid binding to complex objects directly.
+
+For more details, refer to the official Blazor data binding documentation.

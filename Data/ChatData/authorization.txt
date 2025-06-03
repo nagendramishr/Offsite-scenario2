@@ -1,0 +1,12 @@
+# Authorization
+## Description
+Blazor supports role-based and policy-based authorization using `AuthorizeView`.
+
+## Resolution
+To resolve authorization issues:
+1. Use `AuthorizeView` for conditional rendering based on roles.
+2. Define policies in `Program.cs`.
+3. Debug authorization issues using logging.
+4. Test authorization rules using unit tests.
+
+For more details, refer to the official Blazor authorization documentation.

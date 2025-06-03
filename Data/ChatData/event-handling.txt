@@ -1,0 +1,12 @@
+# Event Handling
+## Description
+Blazor supports event handling using the `@on` directive.
+
+## Resolution
+To resolve event handling issues:
+1. Use `@onClick`, `@onInput`, and other directives for event binding.
+2. Pass event arguments using `EventCallback`.
+3. Debug event handling using browser tools.
+4. Avoid heavy computations in event handlers.
+
+For more details, refer to the official Blazor event handling documentation.

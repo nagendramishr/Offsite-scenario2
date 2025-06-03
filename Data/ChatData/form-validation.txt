@@ -1,0 +1,15 @@
+# Form Validation
+## Keywords
+form validation, form-validation
+
+## Description
+Blazor provides built-in support for form validation using `EditForm` and validation attributes.
+
+## Resolution
+To resolve form validation issues:
+1. Use `DataAnnotations` for model validation.
+2. Implement custom validation logic using `ValidationMessage`.
+3. Debug validation errors using browser tools.
+4. Use third-party libraries for advanced validation scenarios.
+
+For more details, refer to the official Blazor form validation documentation.

@@ -1,0 +1,12 @@
+# Input Validation
+## Description
+Blazor supports input validation using `EditForm` and validation attributes.
+
+## Resolution
+To resolve input validation issues:
+1. Use `DataAnnotations` for model validation.
+2. Implement custom validation logic using `ValidationMessage`.
+3. Debug validation errors using browser tools.
+4. Test input validation using unit tests.
+
+For more details, refer to the official Blazor input validation documentation.

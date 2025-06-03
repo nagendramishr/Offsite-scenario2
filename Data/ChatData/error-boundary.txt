@@ -1,0 +1,12 @@
+# Error Boundary
+## Description
+Blazor supports error handling using the `ErrorBoundary` component.
+
+## Resolution
+To resolve error boundary issues:
+1. Use `ErrorBoundary` to catch unhandled exceptions.
+2. Debug errors using browser tools.
+3. Log errors using `ILogger`.
+4. Test error handling using unit tests.
+
+For more details, refer to the official Blazor error boundary documentation.

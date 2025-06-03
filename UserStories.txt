@@ -50,3 +50,12 @@ Do use [CascadingParameter] AuthenticationState for user/role info on every page
 - As a developer, I want the backend implemented in .NET and the database to use SQLite so that the system is lightweight and maintainable.
 - As a user, I want to access the system via a web-based frontend so that it is easily accessible.
 - As an admin, I want the system to be hosted in a self-contained container so that deployment and scaling are simplified.
+
+9. AI Chat Assistant
+- As a user, I want to access an AI-powered chat assistant from anywhere in the application so that I can get instant help or guidance.
+- As a user, I want to ask the chat assistant questions about how to use the ticketing system so that I can resolve issues without waiting for human support.
+- As a support agent, I want to use the chat assistant to get suggestions for ticket responses or troubleshooting steps so that I can assist users more efficiently.
+- As an admin, I want to review chat interactions for quality and improvement so that the AI assistant remains helpful and accurate.
+- As a developer, I want the chat assistant to use secure server-side integration with OpenAI so that sensitive data is protected.
+- As a developer, I want the chat assistant to support a LocalChat mode, which reads from a ChatData/FAQ file and returns local answers for recognized keywords, so that the system can provide instant, offline, or custom responses when configured.
+- As an admin, I want to be able to configure whether the chat assistant uses LocalChat or OpenAIChat, so that I can control the source of responses based on privacy, cost, or connectivity needs.

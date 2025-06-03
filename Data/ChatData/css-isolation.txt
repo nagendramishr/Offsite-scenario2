@@ -1,0 +1,12 @@
+# CSS Isolation
+## Description
+Blazor supports CSS isolation for components using `.razor.css` files.
+
+## Resolution
+To resolve CSS isolation issues:
+1. Use `.razor.css` files for component-specific styles.
+2. Debug CSS issues using browser tools.
+3. Avoid global styles that conflict with isolated styles.
+4. Test CSS isolation using unit tests.
+
+For more details, refer to the official Blazor CSS isolation documentation.

@@ -1,6 +1,8 @@
 ﻿@implements IDisposable
 @using off2.Data
+@using off2.Components.Layout
 @using off2.Data.Enums
+@using off2.Components.Chat
 
 @inject NavigationManager NavigationManager
 @inject RoleHelper RoleHelper
@@ -71,6 +73,16 @@
                 </div>
             </NotAuthorized>
         </AuthorizeView>
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/chat">
+                        <span class="bi bi-robot"></span> @(isLocalChat ? "Chat" : "AI Chat")
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
     </nav>
 </div>
 
@@ -78,6 +90,7 @@
     private string? currentUrl;
     private bool isAdmin;
     private bool isAgent;
+    private bool isLocalChat;
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,6 +99,12 @@
 
         isAdmin = await RoleHelper.IsAdmin();
         isAgent = await RoleHelper.IsAgent();
+        // Determine chat mode from configuration
+        var config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddJsonFile($"appsettings.Development.json", optional: true)
+            .Build();
+        isLocalChat = config.GetValue<bool>("Chat:UseLocalChat");
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)

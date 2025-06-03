@@ -1,0 +1,12 @@
+# Error Handling
+## Description
+Blazor provides mechanisms to handle errors gracefully using `ErrorBoundary` and exception handling.
+
+## Resolution
+To resolve error handling issues:
+1. Use `ErrorBoundary` to catch unhandled exceptions.
+2. Implement global error handling in services.
+3. Log errors using `ILogger`.
+4. Debug errors using browser tools.
+
+For more details, refer to the official Blazor error handling documentation.

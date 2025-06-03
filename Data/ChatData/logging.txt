@@ -1,0 +1,12 @@
+# Logging
+## Description
+Blazor supports logging using the `ILogger` interface.
+
+## Resolution
+To resolve logging issues:
+1. Inject `ILogger` into components and services.
+2. Use different log levels (`Trace`, `Debug`, `Information`, `Warning`, `Error`, `Critical`).
+3. Debug logging issues using browser tools.
+4. Configure logging in `Program.cs`.
+
+For more details, refer to the official Blazor logging documentation.

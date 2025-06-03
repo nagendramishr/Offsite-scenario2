@@ -1,0 +1,12 @@
+# File Upload
+## Description
+Blazor supports file upload functionality using the `InputFile` component.
+
+## Resolution
+To resolve file upload issues:
+1. Use `InputFile` for file selection.
+2. Process files using `IBrowserFile`.
+3. Debug file upload issues using browser tools.
+4. Validate file types and sizes before processing.
+
+For more details, refer to the official Blazor file upload documentation.

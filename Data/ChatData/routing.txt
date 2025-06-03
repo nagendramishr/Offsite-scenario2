@@ -1,0 +1,15 @@
+# Routing
+## Keywords
+routing, routing issues
+
+## Description
+Blazor uses a routing system to navigate between components using URLs.
+
+## Resolution
+To resolve routing issues:
+1. Define routes using the `@page` directive.
+2. Use `NavigationManager` for programmatic navigation.
+3. Ensure route parameters are correctly defined.
+4. Debug routing issues using browser tools.
+
+For more details, refer to the official Blazor routing documentation.

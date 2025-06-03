@@ -1,0 +1,11 @@
+@page "/chat"
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Web
+@using off2.Components.Chat
+@attribute [Authorize]
+
+<h2>Chat</h2>
+
+<off2.Components.Chat.ChatAssistant />

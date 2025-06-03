@@ -76,6 +76,16 @@ builder.Services.AddScoped<CommentService>();
 builder.Services.AddScoped<AttachmentService>();
 builder.Services.AddScoped<NotificationService>();
 
+// Register chat service based on configuration
+if (builder.Configuration.GetValue<bool>("Chat:UseLocalChat"))
+{
+    builder.Services.AddScoped<IChatService, LocalChatService>();
+}
+else
+{
+    builder.Services.AddScoped<IChatService, OpenAIChatService>();
+}
+
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 var app = builder.Build();

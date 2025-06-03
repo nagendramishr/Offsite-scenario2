@@ -1,0 +1,12 @@
+# HTTP Client
+## Description
+Blazor supports HTTP communication using `HttpClient`.
+
+## Resolution
+To resolve HTTP client issues:
+1. Inject `HttpClient` into services and components.
+2. Handle HTTP errors using exception handling.
+3. Debug HTTP requests using browser tools.
+4. Test HTTP client functionality using unit tests.
+
+For more details, refer to the official Blazor HTTP client documentation.

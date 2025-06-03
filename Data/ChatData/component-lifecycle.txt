@@ -1,0 +1,15 @@
+# Component Lifecycle
+## Keywords
+component lifecycle, component-lifecycle
+
+## Description
+Blazor components have a well-defined lifecycle with methods like `OnInitialized`, `OnParametersSet`, and `OnAfterRender`.
+
+## Resolution
+To handle lifecycle issues:
+1. Use `OnInitializedAsync` for asynchronous initialization.
+2. Avoid heavy computations in `OnAfterRender`.
+3. Use `StateHasChanged` to trigger UI updates.
+4. Debug lifecycle methods using breakpoints.
+
+For more details, refer to the official Blazor lifecycle documentation.

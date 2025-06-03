@@ -1,0 +1,12 @@
+# SignalR
+## Description
+Blazor supports real-time communication using SignalR.
+
+## Resolution
+To resolve SignalR issues:
+1. Use `HubConnection` for client-server communication.
+2. Handle connection lifecycle events (`OnConnected`, `OnDisconnected`).
+3. Debug SignalR issues using browser tools.
+4. Test SignalR functionality using unit tests.
+
+For more details, refer to the official Blazor SignalR documentation.

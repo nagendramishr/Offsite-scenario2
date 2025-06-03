@@ -1,0 +1,12 @@
+# Accessibility
+## Description
+Blazor applications can be made accessible by following web accessibility guidelines.
+
+## Resolution
+To resolve accessibility issues:
+1. Use semantic HTML elements.
+2. Provide ARIA attributes for dynamic content.
+3. Test accessibility using tools like Axe.
+4. Ensure keyboard navigation works correctly.
+
+For more details, refer to the official Blazor accessibility documentation.

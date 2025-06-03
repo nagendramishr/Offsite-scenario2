@@ -1,0 +1,12 @@
+# Testing
+## Description
+Blazor supports testing using unit tests and integration tests.
+
+## Resolution
+To resolve testing issues:
+1. Use `TestContext` for unit tests.
+2. Mock services using `Moq`.
+3. Debug test failures using logging.
+4. Test UI components using `bUnit`.
+
+For more details, refer to the official Blazor testing documentation.

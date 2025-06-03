@@ -1,0 +1,15 @@
+# Blazor UI
+## Keywords
+blazor ui, blazor-ui
+
+## Description
+Blazor provides a component-based UI framework for building interactive web applications.
+
+## Resolution
+To resolve common Blazor UI issues:
+1. Ensure proper binding of data using `@bind`.
+2. Use `RenderFragment` for dynamic content.
+3. Debug rendering issues using the browser's developer tools.
+4. Optimize component rendering with `ShouldRender`.
+
+For more details, refer to the official Blazor documentation.

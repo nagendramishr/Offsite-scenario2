@@ -1,0 +1,12 @@
+# Performance
+## Description
+Blazor applications can be optimized for performance by reducing rendering overhead and minimizing network calls.
+
+## Resolution
+To resolve performance issues:
+1. Use `ShouldRender` to control rendering.
+2. Optimize data binding with `@bind`.
+3. Cache data to reduce network calls.
+4. Use `Virtualize` for large lists.
+
+For more details, refer to the official Blazor performance documentation.

@@ -1,0 +1,12 @@
+# Globalization
+## Description
+Blazor supports globalization and localization using `IStringLocalizer`.
+
+## Resolution
+To resolve globalization issues:
+1. Use `IStringLocalizer` for localized strings.
+2. Add resource files for each supported language.
+3. Debug localization issues using logging.
+4. Test globalization using browser tools.
+
+For more details, refer to the official Blazor globalization documentation.

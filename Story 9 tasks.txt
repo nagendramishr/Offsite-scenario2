@@ -1,0 +1,39 @@
+Story 9 Tasks: AI Chat Assistant
+
+All tasks below must use the built-in features of Blazor Server and .NET 9 wherever possible.
+
+1. Design the Chat Assistant UI
+- Create a Razor component (e.g., ChatAssistant.razor) for the chat interface using Blazor Server's component model.
+- Add a button or nav item to open the chat from anywhere in the app using Blazor routing and component composition.
+- Ensure the chat window is accessible and non-intrusive (e.g., modal or side panel) using Blazor's built-in UI features.
+
+2. Implement Server-Side Chat Service
+- Create a C# service to securely interact with OpenAI (or Azure OpenAI) APIs, using .NET 9 dependency injection and configuration.
+- Store API keys securely in configuration (not exposed to the client), leveraging .NET configuration providers.
+- Add dependency injection for the chat service using Blazor Server's DI system.
+
+3. Integrate Chat Component
+- Inject the chat service into the ChatAssistant component using Blazor's DI.
+- Handle user input, send messages to the service, and display AI responses using Blazor's event handling and data binding.
+- Maintain chat history within the session using Blazor Server's state management features.
+
+4. Role-Based Features
+- Allow all users to access the chat for help and guidance, using Blazor's built-in authentication and authorization.
+- Enable support agents to request ticket response suggestions or troubleshooting steps, using role-based logic in Blazor.
+- Provide admins with access to chat logs for review and quality improvement, using Blazor's authorization features.
+
+5. Security & Privacy
+- Ensure all chat interactions are processed server-side to protect sensitive data, leveraging Blazor Server's server-side execution model.
+- Log chat interactions for admin review, ensuring compliance with privacy policies, using .NET logging and data storage features.
+
+6. Testing & Validation
+- Test chat functionality for all user roles (user, agent, admin) using Blazor's built-in testing tools and .NET 9 test frameworks.
+- Validate that the chat assistant does not expose sensitive information.
+- Ensure the chat is responsive and works across devices, using Blazor's UI capabilities.
+
+7. Documentation
+- Document how to configure and use the chat assistant, referencing Blazor Server and .NET 9 features.
+- Provide admin instructions for reviewing chat logs and improving AI responses.
+
+8. Sample chat solution documents
+- Create sample documents that explain how to resolve a problem along with their associated keywords

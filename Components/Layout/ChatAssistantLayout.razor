@@ -1,0 +1,68 @@
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Web
+@using off2.Data
+@using Microsoft.AspNetCore.Components.Authorization
+@inject OpenAIChatService ChatService
+@inject AuthenticationStateProvider AuthStateProvider
+
+<div class="chat-assistant-modal" style="@(IsOpen ? "display:block;" : "display:none;")">
+    <div class="chat-header">
+        <span>AI Chat Assistant</span>
+        <button class="btn btn-sm btn-close" @onclick="Close">×</button>
+    </div>
+    <div class="chat-history">
+        @foreach (var msg in Messages)
+        {
+            <div class="@(msg.IsUser ? "user-msg" : "ai-msg")">@msg.Text</div>
+        }
+    </div>
+    <div class="chat-input-row">
+        <input class="form-control" @bind="UserInput" @onkeydown="HandleKey" placeholder="Type your message..." />
+        <button class="btn btn-primary" @onclick="SendMessage" disabled="@IsSending">Send</button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+
+    private List<ChatMessage> Messages = new();
+    private string? UserInput;
+    private bool IsSending;
+    private ClaimsPrincipal? User;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        User = authState.User;
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(UserInput)) return;
+        Messages.Add(new ChatMessage { Text = UserInput!, IsUser = true });
+        var input = UserInput;
+        UserInput = string.Empty;
+        IsSending = true;
+        StateHasChanged();
+        var response = await ChatService.GetChatResponseAsync(input!, User);
+        Messages.Add(new ChatMessage { Text = response, IsUser = false });
+        IsSending = false;
+    }
+
+    private void Close() => IsOpenChanged.InvokeAsync(false);
+
+    private void HandleKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            _ = SendMessage();
+        }
+    }
+
+    private class ChatMessage
+    {
+        public required string Text { get; set; }
+        public bool IsUser { get; set; }
+    }
+}

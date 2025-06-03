@@ -1,0 +1,12 @@
+# Forms
+## Description
+Blazor supports form handling using `EditForm` and validation attributes.
+
+## Resolution
+To resolve form handling issues:
+1. Use `EditForm` for form submission.
+2. Implement validation using `DataAnnotations`.
+3. Debug form issues using browser tools.
+4. Test form handling using unit tests.
+
+For more details, refer to the official Blazor forms documentation.

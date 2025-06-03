@@ -11,7 +11,9 @@
 
   <ItemGroup>
     <!-- Removed Data\app.db from output, so EF Core can create it -->
-  </ItemGroup>  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Markdig" Version="0.41.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="9.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.5" />
@@ -29,5 +31,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.5" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="Data\ChatData\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

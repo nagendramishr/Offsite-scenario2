@@ -1,0 +1,12 @@
+# Dependency Injection
+## Description
+Blazor provides built-in support for dependency injection using the `@inject` directive.
+
+## Resolution
+To resolve dependency injection issues:
+1. Register services in `Program.cs` using `AddScoped`, `AddSingleton`, or `AddTransient`.
+2. Use `@inject` to inject services into components.
+3. Debug injection issues using logging.
+4. Avoid circular dependencies in service registration.
+
+For more details, refer to the official Blazor dependency injection documentation.
