@@ -17,7 +17,9 @@ public class TicketComment
     [Required]
     public string CreatedById { get; set; } = "";
     [ForeignKey("CreatedById")]
-    public ApplicationUser? CreatedBy { get; set; }
-
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public ApplicationUser? CreatedBy { get; set; }    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    
+    public DateTime? LastModifiedAt { get; set; }
+    
+    public bool IsEdited { get; set; }
 }

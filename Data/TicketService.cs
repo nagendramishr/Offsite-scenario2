@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
-using off2.Data.Enums;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Linq;
+using off2.Data.Enums;
 
 namespace off2.Data;
 
@@ -10,15 +12,18 @@ public class TicketService
     private readonly ApplicationDbContext _context;
     private readonly RoleHelper _roleHelper;
     private readonly AuthenticationStateProvider _authStateProvider;
+    private readonly NotificationService _notificationService;
 
     public TicketService(
         ApplicationDbContext context,
         RoleHelper roleHelper,
-        AuthenticationStateProvider authStateProvider)
+        AuthenticationStateProvider authStateProvider,
+        NotificationService notificationService)
     {
         _context = context;
         _roleHelper = roleHelper;
         _authStateProvider = authStateProvider;
+        _notificationService = notificationService;
     }    public async Task<List<Ticket>> GetTicketsAsync(
         string? searchQuery = null,
         TicketStatus? status = null,
@@ -150,56 +155,60 @@ public class TicketService
 
     public async Task<bool> UpdateTicketAsync(Ticket ticket)
     {
-        var authState = await _authStateProvider.GetAuthenticationStateAsync();
-        var userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var existingTicket = await _context.Tickets
+            .Include(t => t.AssignedTo)
+            .FirstOrDefaultAsync(t => t.Id == ticket.Id);
 
-        var existingTicket = await _context.Tickets.FindAsync(ticket.Id);
-        if (existingTicket == null) return false;
-
-        // Check permissions
-        if (!await _roleHelper.IsAdmin() && !await _roleHelper.IsAgent() && existingTicket.CreatedById != userId)
-        {
+        if (existingTicket == null)
             return false;
-        }
 
-        // Track changes for audit log
-        if (existingTicket.Title != ticket.Title)
-            await AddAuditLogAsync(ticket.Id, "Update", "Title", existingTicket.Title, ticket.Title);
-            
-        if (existingTicket.Description != ticket.Description)
-            await AddAuditLogAsync(ticket.Id, "Update", "Description", existingTicket.Description, ticket.Description);
-            
-        if (existingTicket.Priority != ticket.Priority)
-            await AddAuditLogAsync(ticket.Id, "Update", "Priority", existingTicket.Priority.ToString(), ticket.Priority.ToString());
-            
-        if (existingTicket.Status != ticket.Status)
-            await AddAuditLogAsync(ticket.Id, "Update", "Status", existingTicket.Status.ToString(), ticket.Status.ToString());
-            
-        if (existingTicket.Category != ticket.Category)
-            await AddAuditLogAsync(ticket.Id, "Update", "Category", existingTicket.Category, ticket.Category);
-            
-        if (existingTicket.TechArea != ticket.TechArea)
-            await AddAuditLogAsync(ticket.Id, "Update", "TechArea", existingTicket.TechArea, ticket.TechArea);
+        var oldStatus = existingTicket.Status;
+        var oldPriority = existingTicket.Priority;
+        var oldAssignedToId = existingTicket.AssignedToId;
 
-        if (existingTicket.AssignedToId != ticket.AssignedToId)
-            await AddAuditLogAsync(ticket.Id, "Update", "AssignedTo", existingTicket.AssignedToId, ticket.AssignedToId);
-
-        // Update allowed fields
+        // Update ticket
         existingTicket.Title = ticket.Title;
         existingTicket.Description = ticket.Description;
+        existingTicket.Status = ticket.Status;
         existingTicket.Priority = ticket.Priority;
         existingTicket.Category = ticket.Category;
         existingTicket.TechArea = ticket.TechArea;
+        existingTicket.AssignedToId = ticket.AssignedToId;
         existingTicket.UpdatedAt = DateTime.UtcNow;
 
-        // Only agents and admins can update these fields
-        if (await _roleHelper.IsAdmin() || await _roleHelper.IsAgent())
+        await _context.SaveChangesAsync();
+
+        // Send notifications
+        var authState = await _authStateProvider.GetAuthenticationStateAsync();
+        var currentUserId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var currentUserName = authState.User.Identity?.Name;
+
+        if (oldStatus != ticket.Status && existingTicket.AssignedToId != null)
         {
-            existingTicket.Status = ticket.Status;
-            existingTicket.AssignedToId = ticket.AssignedToId;
+            await _notificationService.NotifyTicketStatusChanged(
+                existingTicket.AssignedToId,
+                ticket.Id,
+                oldStatus,
+                ticket.Status);
         }
 
-        await _context.SaveChangesAsync();
+        if (oldPriority != ticket.Priority && existingTicket.AssignedToId != null)
+        {
+            await _notificationService.NotifyPriorityChanged(
+                existingTicket.AssignedToId,
+                ticket.Id,
+                oldPriority,
+                ticket.Priority);
+        }
+
+        if (oldAssignedToId != ticket.AssignedToId && ticket.AssignedToId != null)
+        {
+            await _notificationService.NotifyTicketAssigned(
+                ticket.AssignedToId,
+                ticket.Id,
+                currentUserName);
+        }
+
         return true;
     }
 
@@ -238,8 +247,10 @@ public class TicketService
     public async Task<TicketComment> AddCommentAsync(TicketComment comment)
     {
         var authState = await _authStateProvider.GetAuthenticationStateAsync();
-        var userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
-            ?? throw new InvalidOperationException("User is not authenticated");
+        var userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        
+        if (userId == null)
+            throw new UnauthorizedAccessException("User must be authenticated to add a comment.");
 
         comment.CreatedById = userId;
         comment.CreatedAt = DateTime.UtcNow;
