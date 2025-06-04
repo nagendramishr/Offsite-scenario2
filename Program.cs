@@ -13,12 +13,18 @@ using System.Runtime.Versioning;
 using off2.Components;
 using off2.Components.Account;
 using off2.Data;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.Hosting.StaticWebAssets;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Add HttpClient factory for OpenAIChatService
+builder.Services.AddHttpClient();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
@@ -91,6 +97,9 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+// Enable static web assets in all environments
+StaticWebAssetsLoader.UseStaticWebAssets(app.Environment, app.Configuration);
+
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();

@@ -23,7 +23,7 @@
     }
   },
   "postCreateCommand": [ 
-    "dotnet restore",
-    "dotnet tool install --global dotnet-ef && dotnet restore"
+    "dotnet tool install --global dotnet-ef ",
+    "dotnet restore"
   ]
 }

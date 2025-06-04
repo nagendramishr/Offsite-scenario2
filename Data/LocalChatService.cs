@@ -72,8 +72,13 @@ namespace off2.Data
         {
             _faqMap.Clear();
             var faqJsonPath = Path.Combine(_chatDataFolder, "FAQ.json");
+            _logger.LogInformation("Looking for FAQ file at: {FaqJsonPath}", faqJsonPath);
             if (!File.Exists(faqJsonPath))
+            {
+                _logger.LogWarning("FAQ file not found at {FaqJsonPath}", faqJsonPath);
                 return;
+            }
+            _logger.LogInformation("FAQ file exists at {FaqJsonPath}", faqJsonPath);
             var json = File.ReadAllText(faqJsonPath);
             var entries = JsonSerializer.Deserialize<List<FaqEntry>>(json);
             if (entries == null) return;
