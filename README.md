@@ -1,6 +1,22 @@
 # Contoso Tech Blazor Support Site
 
-This is the official support portal for Contoso Tech's flagship product, **Blazor**. The site provides a modern, secure, and extensible platform for customer support, ticket management, and AI-powered assistance, built with .NET 9 and Blazor Server.
+---
+
+## Reference Repository & Practice Goals
+
+This repository is intended as a **reference project** for practicing advanced .NET, Blazor, and AI integration scenarios. You can use this repo to experiment, extend, and learn modern full-stack development patterns.
+
+### Practice Goals
+- **Add a Semantic Kernel Agent**
+  - Integrate [Semantic Kernel](https://github.com/microsoft/semantic-kernel) to generate new content for the chat assistant.
+  - Enable the agent to inject content into the chat based on support data and user context.
+- **Stretch Goals**
+  - Deploy the app to Azure (App Service, Container Apps, or similar).
+  - Use Azure SQL or CosmosDB as the backend database.
+  - Integrate with Microsoft Entra ID (Azure AD) for authentication.
+  - Add Retrieval-Augmented Generation (RAG) search to enhance chat and support article relevance.
+
+Feel free to fork, extend, and contribute!
 
 ---
 
@@ -17,15 +33,6 @@ To ensure links work correctly, add an `AppUrl` setting to your `appsettings.jso
   "AppUrl": "https://supreme-waddle-7x4gg67p7q5cp6r7-8080.app.github.dev"
 }
 ```
-
-Then, update your code to use this `AppUrl` for generating confirmation and other external links, instead of relying on `Request.Host` or `Request.Scheme`. For example:
-
-```csharp
-var appUrl = _configuration["AppUrl"];
-var callbackUrl = $"{appUrl}/Account/RegisterConfirmation?email={Uri.EscapeDataString(email)}";
-```
-
-This ensures all generated links are valid and accessible from outside the Codespace.
 
 ---
 
