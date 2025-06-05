@@ -23,6 +23,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Register AppUrlProvider as a singleton for use in all components
+builder.Services.AddSingleton<ConfigProvider>();
+
 // Add HttpClient factory for OpenAIChatService
 builder.Services.AddHttpClient();
 
@@ -56,8 +59,18 @@ if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientS
 }
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// Add a config option for SQL debug logging
+var sqlDebug = builder.Configuration.GetValue("Logging:SqlDebug", false);
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+{
+    options.UseSqlite(connectionString);
+    if (sqlDebug)
+    {
+        options.EnableSensitiveDataLogging();
+        options.EnableDetailedErrors();
+    }
+});
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Use AddDefaultIdentity for full UI/cookie support in Blazor Server
@@ -95,6 +108,11 @@ else
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 var app = builder.Build();
+
+// Log the resolved AppUrl at startup using ASP.NET Core logger
+var configProvider = app.Services.GetRequiredService<ConfigProvider>();
+var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
+logger.LogInformation("[ConfigProvider] AppUrl resolved to: {AppUrl}", configProvider.AppUrl);
 
 // Configure the HTTP request pipeline.
 // Enable static web assets in all environments
