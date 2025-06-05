@@ -7,14 +7,26 @@
 This repository is intended as a **reference project** for practicing advanced .NET, Blazor, and AI integration scenarios. You can use this repo to experiment, extend, and learn modern full-stack development patterns.
 
 ### Practice Goals
-- **Add a Semantic Kernel Agent**
-  - Integrate [Semantic Kernel](https://github.com/microsoft/semantic-kernel) to generate new content for the chat assistant.
-  - Enable the agent to inject content into the chat based on support data and user context.
+- **Suggestions for improving the Chat experience**
+  - Use Azure AI services and Semantic Kernel to improve the chat experience, fine-tuned with content from the support documents.
+    - Integrate OpenAI and Semantic Kernel for:
+      - Generating new content and answers for chat conversations.
+      - Summarizing or rephrasing user and agent messages.
+      - Suggesting alternate phrasing or clarifications when users create tickets.
+      - Suggesting content from the support library to agents in the ticketing system.
+      - Analyzing the current chat/ticket and injecting relevant support articles automatically.
+      - Classifying tickets, analyzing sentiment, and automating triage.
+    - Use Retrieval-Augmented Generation (RAG) to combine search over support docs/FAQ with generative AI for more accurate, up-to-date answers.
+    - Proactively suggest next steps or related documentation based on user input.
 - **Stretch Goals**
   - Deploy the app to Azure (App Service, Container Apps, or similar).
   - Use Azure SQL or CosmosDB as the backend database.
   - Integrate with Microsoft Entra ID (Azure AD) for authentication.
   - Add Retrieval-Augmented Generation (RAG) search to enhance chat and support article relevance.
+  - Deploy using Azure SignalR so that ticket updates are live.
+  - Use Azure Cognitive Search for advanced RAG scenarios.
+  - Automate knowledge base expansion by suggesting new FAQ entries based on chat/ticket trends.
+  - Using a Github Copilot Agent, create automated test cases
 
 Feel free to fork, extend, and contribute!
 
