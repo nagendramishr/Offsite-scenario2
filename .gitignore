@@ -1,3 +1,6 @@
+app.db
+app.db-shm
+app.db-wal
 ## .NET 9, .NET Core, and Visual Studio
 appsettings.json
 appsettings.*.json
