@@ -11,6 +11,7 @@
 @inject IEmailSender<ApplicationUser> EmailSender
 @inject IdentityUserAccessor UserAccessor
 @inject NavigationManager NavigationManager
+@inject ConfigProvider ConfigProvider
 
 <PageTitle>Manage email</PageTitle>
 
@@ -85,9 +86,9 @@
         var userId = await UserManager.GetUserIdAsync(user);
         var code = await UserManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail);
         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-        var callbackUrl = NavigationManager.GetUriWithQueryParameters(
-            NavigationManager.ToAbsoluteUri("Account/ConfirmEmailChange").AbsoluteUri,
-            new Dictionary<string, object?> { ["userId"] = userId, ["email"] = Input.NewEmail, ["code"] = code });
+        var appUrl = ConfigProvider.AppUrl.TrimEnd('/');
+        var confirmPath = $"/Account/ConfirmEmailChange?userId={Uri.EscapeDataString(userId)}&email={Uri.EscapeDataString(Input.NewEmail)}&code={Uri.EscapeDataString(code)}";
+        var callbackUrl = appUrl + confirmPath;
 
         await EmailSender.SendConfirmationLinkAsync(user, Input.NewEmail, HtmlEncoder.Default.Encode(callbackUrl));
 

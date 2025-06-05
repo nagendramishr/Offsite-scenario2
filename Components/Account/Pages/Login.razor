@@ -11,6 +11,7 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 @inject IConfiguration Configuration
+@inject ConfigProvider ConfigProvider
 
 <PageTitle>Log in</PageTitle>
 
@@ -128,7 +129,13 @@
         if (result.Succeeded)
         {
             Logger.LogInformation("User {UserName} logged in successfully.", user.UserName);
-            NavigationManager.NavigateTo(ReturnUrl ?? "/", forceLoad: true);
+            // Use AppUrl for root redirect if ReturnUrl is null or empty
+            var redirectUrl = ReturnUrl;
+            if (string.IsNullOrWhiteSpace(redirectUrl))
+            {
+                redirectUrl = ConfigProvider.AppUrl + "/";
+            }
+            NavigationManager.NavigateTo(redirectUrl, forceLoad: true);
         }
         else if (result.RequiresTwoFactor)
         {

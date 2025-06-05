@@ -4,6 +4,31 @@ This is the official support portal for Contoso Tech's flagship product, **Blazo
 
 ---
 
+## Special Notes for GitHub Codespaces
+
+If you are running this project in **GitHub Codespaces**, you may encounter issues with email confirmation or other links containing `8080` in the URL (e.g., `https://your-codespace-url:8080/...`). This happens because Codespaces uses a public proxy URL, and the application may generate links with the internal port, which results in a 404 error.
+
+**Workaround:**  
+To ensure links work correctly, add an `AppUrl` setting to your `appsettings.json` (replace with your Codespace URL):
+
+```json
+{
+  // ...existing settings...
+  "AppUrl": "https://supreme-waddle-7x4gg67p7q5cp6r7-8080.app.github.dev"
+}
+```
+
+Then, update your code to use this `AppUrl` for generating confirmation and other external links, instead of relying on `Request.Host` or `Request.Scheme`. For example:
+
+```csharp
+var appUrl = _configuration["AppUrl"];
+var callbackUrl = $"{appUrl}/Account/RegisterConfirmation?email={Uri.EscapeDataString(email)}";
+```
+
+This ensures all generated links are valid and accessible from outside the Codespace.
+
+---
+
 ## Features
 
 - **AI Chat Assistant**

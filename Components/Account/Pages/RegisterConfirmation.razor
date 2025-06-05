@@ -9,6 +9,7 @@
 @inject IEmailSender<ApplicationUser> EmailSender
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject ConfigProvider ConfigProvider
 
 <PageTitle>Register confirmation</PageTitle>
 
@@ -54,7 +55,7 @@ else
         {
             user = await UserManager.FindByEmailAsync(Email);
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
             statusMessage = "Error: Multiple accounts found with this email address. Please contact support.";
             return;
@@ -70,9 +71,13 @@ else
             var userId = await UserManager.GetUserIdAsync(user);
             var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            emailConfirmationLink = NavigationManager.GetUriWithQueryParameters(
-                NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
-                new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
+            var appUrl = ConfigProvider.AppUrl.TrimEnd('/');
+            var confirmPath = $"/Account/ConfirmEmail?userId={Uri.EscapeDataString(userId)}&code={Uri.EscapeDataString(code)}";
+            if (!string.IsNullOrEmpty(ReturnUrl))
+            {
+                confirmPath += $"&returnUrl={Uri.EscapeDataString(ReturnUrl)}";
+            }
+            emailConfirmationLink = appUrl + confirmPath;
         }
     }
 }
