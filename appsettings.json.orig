@@ -16,15 +16,20 @@
       "ClientSecret": "your-client-secret-here"
     }
   },
+  "AppUrl": "",
   "Logging": {
     "LogLevel": {
       "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
+      "Microsoft.AspNetCore": "Warning",
+      "Microsoft.EntityFrameworkCore.Database.Command": "Warning"
+    },
+    "SqlDebug": false
   },
   "AllowedHosts": "*",
   "Chat": {
     "UseLocalChat": true
+  },
+  "Identity": {
+    "RequireConfirmedAccount": false
   }
-
 }
