@@ -141,7 +141,14 @@ To ensure links work correctly, add an `AppUrl` setting to your `appsettings.jso
      dotnet run update-admin-password
      ```
    - See `DATABASE-SETUP.md` and `DB-readme.md` for details.
-7. **Run the app**
+
+7. **(Optional) Load Sample Test Data**
+   - To populate the system with sample users and tickets for testing:
+     - See `FeedSampleData.md` for detailed instructions on importing test data
+     - Sample data includes 100+ users with different roles and 40+ tickets spanning 3 years
+     - All test accounts use the password: `Test123!`
+
+8. **Run the app**
    ```sh
    export ASPNETCORE_ENVIRONMENT=Development
    dotnet run
@@ -166,6 +173,8 @@ To ensure links work correctly, add an `AppUrl` setting to your `appsettings.jso
 
 - **Database Setup:**
   - `DATABASE-SETUP.md`, `DB-readme.md`, `dbsetup.txt`, `dbupdate.txt`
+- **Sample Data:**
+  - `FeedSampleData.md` (instructions for loading test users and tickets)
 - **Authentication:**
   - `MA-readme.md` (Microsoft OAuth setup), `db-auth.readme.md`
 - **Requirements & User Stories:**
